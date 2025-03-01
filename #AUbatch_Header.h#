@@ -1,0 +1,56 @@
+#ifndef AUBATCH_H
+#define AUBATCH_H
+
+#include <pthread.h>  // Provides threading support
+#include <stdio.h>    // Standard I/O functions
+#include <stdlib.h>   // Memory management functions
+#include <unistd.h>   // UNIX standard symbolic constants and types
+#include <sys/types.h> // Defines data types used in system calls
+#include <sys/wait.h> // Provides macros related to process control
+#include <sys/time.h> // Provides time functions
+
+// Job Structure
+typedef struct job {
+    char name[256];  // Name of the job
+    int execution_time; // Expected execution time in seconds
+    int priority; // Job priority level
+    struct timeval arrival_time; // Timestamp when the job was submitted
+    struct timeval start_time;   // Timestamp when job starts execution
+    struct timeval finish_time;  // Timestamp when job completes execution
+    struct job *next; // Pointer to the next job in the queue
+} job_t;
+
+int compare_jobs(job_t *a, job_t *b); // compare_jobs()
+
+// Global Performance Metrics (Declared as extern)
+extern int total_jobs;
+extern int completed_jobs;
+extern double total_turnaround_time;
+extern double total_cpu_time;
+extern double total_waiting_time;
+extern int scheduling_policy;
+extern job_t *completed_jobs_head;
+
+// Function Prototypes
+void initialize_scheduler();  // Initializes scheduler threads
+void submit_job(const char *name, int execution_time, int priority); // Adds a job to the queue
+void list_jobs();  // Displays the list of jobs in the queue
+void sort_jobs(); // Sort jobs based on scheudling
+void change_scheduling_policy(int policy);  // Switch between scheduling policies
+void *scheduler_thread(void *arg);  // Function for the scheduler thread
+void *dispatcher_thread(void *arg);  // Function for the dispatcher thread
+void execute_job(job_t *job);  // Executes a job using execv()
+void cleanup();  // Cleans up allocated resources
+void clear_completed(); // Clears completed job in completed queue
+
+// Performance Evaluation Functions
+void record_job_start(job_t *job);  // Records when a job starts
+void record_job_finish(job_t *job);  // Records when a job finishes
+void print_performance_metrics();  // Displays performance metrics
+
+// Synchronization Variables (Declared as extern)
+extern pthread_mutex_t job_queue_mutex;  // Mutex for job queue synchronization
+extern pthread_cond_t job_available;  // Condition variable to signal job availability
+
+#endif
+

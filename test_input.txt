@@ -1,0 +1,21 @@
+help
+run job1 5 2
+run job2 10 6
+run job3 3 3
+run job4 20 1
+run job6 4 4
+list
+sjf
+run job1 5 2
+run job2 10 6
+run job3 3 3
+run job4 20 1
+run job6 4 4
+list
+priority
+run job1 5 2
+run job2 10 6
+run job3 3 3
+run job4 20 1
+run job6 4 4
+quit

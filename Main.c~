@@ -1,0 +1,119 @@
+#include "AUbatch_Header.h"
+#include <string.h>
+#include <stdio.h>
+
+void display_menu() {
+  printf("\n========== AUbatch Scheduler Menu ==========\n");
+  printf("\nAvailable Commands:\n");
+  printf(" run - Submit multiple jobs in one input.\n");
+  printf(" list  - Display the current job queue.\n");
+  printf(" fcfs  - Change the scheduling policy to First Come First Serve.\n");
+  printf(" sjf  - Change the scheduling policy to Shortest Job First.\n");
+  printf(" priority  - Change the scheduling policy to Priority-Based Scheduling.\n\n");
+  printf(" quit  - Exit the program.\n\n");
+  printf("========================================\n");
+}
+
+void prompt_for_queue_action() {
+    char choice[10];
+    printf("\nBatch of jobs complete. Do you want to (1) Change Scheduling Policy or (2) Clear Completed Jobs? (1/2/none): ");
+    fgets(choice, sizeof(choice), stdin);
+    choice[strcspn(choice, "\n")] = 0; // Remove newline character
+
+    if (strcmp(choice, "1") == 0) {
+        printf("\nSelect new scheduling policy:\n");
+        printf("1 - First Come First Serve (FCFS)\n");
+        printf("2 - Shortest Job First (SJF)\n");
+        printf("3 - Priority Scheduling\n");
+        printf("> ");
+        
+        int new_policy;
+        if (scanf("%d", &new_policy) == 1) {
+            while (getchar() != '\n'); // Clear input buffer
+            if (new_policy == 1) {
+                change_scheduling_policy(0);
+            } else if (new_policy == 2) {
+                change_scheduling_policy(1);
+            } else if (new_policy == 3) {
+                change_scheduling_policy(2);
+            } else {
+                printf("Invalid choice. Keeping the current policy.\n");
+            }
+        } else {
+            printf("Invalid input. Keeping the current policy.\n");
+            while (getchar() != '\n'); // Clear buffer if input fails
+        }
+    } else if (strcmp(choice, "5") == 0) {
+        clear_completed_jobs();
+    }
+}
+
+int main() {
+  char command[256]; // Buffer to store user input commands
+  initialize_scheduler(); // Initialize the scheduler and create threads
+  printf("\n********** Welcome to AUbatch Scheduler! ***********\n");
+  display_menu();
+  while (1) {
+    // Loop to continuously accept user commands
+    printf("\n> "); // Display prompt
+    fgets(command, sizeof(command), stdin); // Read user input
+
+    // Remove newline character
+    command[strcspn(command, "\n")] = 0;
+
+	// Check the command
+    if (strncmp(command, "run", 3) == 0){
+        char job_input[1024];
+        printf("\nEnter jobs in the format: <job_name> <exec_time> <priority>, separated by commas\n");
+	printf("Example: job1 10 2, job2 5 3, job3 8 1\n");
+	printf("> ");
+	fgets(job_input, sizeof(job_input), stdin);
+	
+	if (strlen(job_input) <= 1) {
+	  printf(" No jobs entered. Please try again.\n");
+	  continue; 
+	}
+	int job_count = 0;
+	char *token = strtok(job_input, ",");
+	while (token != NULL) {
+	  char name[256];
+	  int exec_time, priority;
+	  if (sscanf(token, " %s %d %d", name, &exec_time, &priority) == 3) {
+	    submit_job(name, exec_time, priority);
+	    job_count++;
+	  } else {
+	    printf("Invalid job format: %s\n", token);
+	  }
+	  token = strtok(NULL, ",");
+	}
+	
+	if (job_count == 0) {
+	  printf(" No valid jobs entered. Please check your format.\n");
+	  continue;
+	}
+	
+	// Apply scheduling policy after all jobs are added
+	sort_jobs();
+    } else if (strncmp(command, "list", 4) == 0) {
+      list_jobs();
+    } else if (strncmp(command, "fcfs", 4) == 0){
+      change_scheduling_policy(0);
+    } else if (strncmp(command, "sjf", 3) == 0) {
+      change_scheduling_policy(1);
+    } else if (strncmp(command, "priority", 8) == 0) {
+      change_scheduling_policy(2);
+    } else if (strncmp(command, "quit", 4) == 0) {
+      cleanup(); // Clean up resources before exiting
+      printf("All jobs cleared. Exiting program.\n"); break;
+    } else if (strncmp(command, "clear", 5) == 0) {
+      clear_completed_jobs();
+    } else {
+      printf(" Unknown command. Try 'help' to see available commands.\n");
+      
+    }
+	
+  }
+
+    return 0;
+}  
+
