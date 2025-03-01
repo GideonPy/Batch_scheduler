@@ -56,7 +56,7 @@ It implements:
 ## 💻 Installation & Compilation
 1. **Clone the repository**:
    ```sh
-   git clone https://github.com/GideonPy/aubatch_scheduler_v2.git
+   git clone https://github.com/GideonPy/Batch_scheduler
    cd <new-repo-name>
 
 ## License
