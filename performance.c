@@ -24,8 +24,7 @@ void record_job_finish(job_t *job) {
   total_waiting_time += waiting_time;
   total_cpu_time += job->execution_time;
   completed_jobs++;
-
-  free(job);
+  
 }
 
 //Prints performance metrics at the end of execution
@@ -43,18 +42,4 @@ void print_performance_metrics() {
   printf("Throughput: %.2f jobs/seconds\n", (double)completed_jobs / total_turnaround_time);
   printf("-----------------------------\n");
 
-  // Clears completed jobs records
-  void clear_completed_jobs() {
-    pthread_mutex_lock(&job_queue_mutex);
-
-    job_t *temp;
-    while (scheduled_queue_head) {
-      temp = scheduled_queue_head;
-      scheduled_queue_head = scheduled_queue_head->next;
-      free(temp);
-    }
-
-    pthread_mutex_unlock(&job_queue_mutex);
-    printf("Completed jobs queue cleared.\n");
-  }
 }
