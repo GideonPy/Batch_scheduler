@@ -1,4 +1,46 @@
 #include "AUbatch.h"
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+
+void initialize_job_submission() {
+  char job_input[1024];
+
+  printf("\nEnter jobs in format: <job_name> <exec_time> <priority>, seperated by commas\n");
+  printf("Example: job1 10 3, job2 5 2, job3 7 1\n> ");
+
+  if(!fgets(job_input, sizeof(job_input), stdin)) {
+    error_message("Failed to read jobs. Try again.");
+    return;
+  }
+
+  if (strlen(job_input) <= 1) {
+    error_message("No jobs entered. Please try again.");
+  return;
+}
+
+int job_count = 0;
+char *token = strtok(job_input, ",");
+while (token != NULL) {
+  char name[256];
+  int exec_time, priority;
+  if (sscanf(token, "%255s %d %d", name, &exec_time, &priority) == 3) {
+    submit_job(name, exec_time, priority);
+    job_count++;
+  }else {
+    printf("[ERROR]: Invalid job format: %s\n", token);
+  }
+  token = strtok(NULL, ",");
+  
+ }
+
+if (job_count == 0) {
+  error_message("No vaild jobs entered.");
+ } else {
+  printf("Successfully added %d jobs to the Submission Queue.\n", job_count);
+ }
+}
+  
 
 void submit_job(const char *name, int execution_time, int priority) {
   pthread_mutex_lock(&job_queue_mutex);
@@ -42,4 +84,25 @@ while (queue) {
 	 queue->priority);
   queue = queue->next;
  }
+}
+
+void clear_job_queue() {
+  pthread_mutex_lock(&job_queue_mutex);
+
+  // Clear Scheduled Queue() {
+  while (scheduled_queue_head) {
+    job_t *temp = scheduled_queue_head;
+    scheduled_queue_head = scheduled_queue_head->next;
+    free(temp);
+  }
+
+  // Clear Submitted Queue
+  while (submission_queue_head) {
+    job_t *temp = submission_queue_head;
+    submission_queue_head = submission_queue_head->next;
+    free(temp);
+  }
+
+  printf("All jobs cleard from both queues.\n");
+  pthread_mutex_unlock(&job_queue_mutex);
 }

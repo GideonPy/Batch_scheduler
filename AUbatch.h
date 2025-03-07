@@ -1,14 +1,15 @@
 #ifndef AUBATCH_H
 #define AUBATCH_H
 
-#include <pthread.h>  // Provides threading support
 #include <stdio.h>    // Standard I/O functions
 #include <stdlib.h>   // Memory management functions
+#include <string.h>
+#include <pthread.h>  // Provides threading support
 #include <unistd.h>   // UNIX standard symbolic constants and types
 #include <sys/types.h> // Defines data types used in system calls
 #include <sys/wait.h> // Provides macros related to process control
 #include <sys/time.h> // Provides time functions
-#include <string.h> 
+ 
 
 // Job Structure
 typedef struct job {
@@ -30,11 +31,12 @@ extern int scheduling_policy;
 extern void flush_completion_messages(void); // Print saved completion messages after main thread
 
 // Function Prototypes
+void initialize_job_submission();
 void submit_job(const char *name, int execution_time, int priority);
 void list_jobs(int queue_type);
 void apply_scheduling_policy(int policy);
 void execute_job(job_t *job);
-
+void clear_job_queue();
 void initialize_scheduler();
 void *scheduler_thread(void *arg);
 void *dispatcher_thread(void *arg);

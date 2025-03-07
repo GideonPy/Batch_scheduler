@@ -8,47 +8,11 @@ void display_menu() {
     printf(" start - Begin job execution from Scheduled Queue.\n");
     printf(" list-submitted - List jobs in Submission Queue.\n");
     printf(" list-scheduled - List jobs in Scheduled Queue.\n");
-    printf(" modify - Move jobs back to Submission Queue to add or edit.\n");
     printf(" quit - Exit the program without running performance metrics.\n");
     printf("====================================================================\n");
 }
 
-//  Prompt user at startup to submit initial jobs
-void initialize_job_submission() {
-    char job_input[1024];
 
-    printf("\nAdd jobs at startup. Enter jobs in format: <job_name> <exec_time> <priority>, separated by commas\n");
-    printf("Example: job1 10 3, job2 5 2, job3 7 1\n> ");
-    if (!fgets(job_input, sizeof(job_input), stdin)) {
-      error_message("Failed to read jobs. Try again." );
-      return;
-    }
-
-    if (strlen(job_input) <= 1) {
-        error_message("No jobs entered. Please try again.");
-        return;
-    }
-
-    int job_count = 0;
-    char *token = strtok(job_input, ",");
-    while (token != NULL) {
-        char name[256];
-        int exec_time, priority;
-        if (sscanf(token, " %255s %d %d", name, &exec_time, &priority) == 3) {
-            submit_job(name, exec_time, priority);
-            job_count++;
-        } else {
-            printf("[ERROR]: Invalid job format: %s\n", token);
-        }
-        token = strtok(NULL, ",");
-    }
-
-    if (job_count == 0) {
-        error_message("No valid jobs entered.");
-    } else {
-        printf("Successfully added %d jobs to the Submission Queue.\n", job_count);
-    }
-}
 
 int main() {
     char command[256];
@@ -143,7 +107,7 @@ int main() {
 	      continue;
 	    }
 	    
-	    // Remove trailing newling
+	    // Remove trailing newline
 	    choice[strcspn(choice, "\n")] = '\0';
 
 	    // Comvert user input to lower case
@@ -159,35 +123,29 @@ int main() {
 		error_message("Invalid input.");
 		while(getchar() != '\n');
 		continue;
-		  }
+	      }
 	      // Flush leftover input
 	      while (getchar() != '\n');
 
 	      apply_scheduling_policy(new_policy);
               printf("New scheduling policy applied. Type 'start' to execute jobs again.\n");
-	    } else if (strcmp(choice, "no") == 0) {
-	       // Move jobs back to Submission Queue if user doesn't want to rerun
-	      pthread_mutex_lock(&job_queue_mutex);
-	      while (submission_queue_head) {
-		job_t *job= submission_queue_head;
-		submission_queue_head = submission_queue_head->next;
+	    }
+	    else if (strcmp(choice, "no") == 0) {
+	      
+	      // Clear all jobs before returning to the menu
+	      clear_job_queue();
 
-		// Re-submit the job, which re-allocates memory
-		submit_job(job->name, job->execution_time, job->priority);
-
-		// Free the old job struct
-		free(job);
-	      }
-	      pthread_mutex_unlock(&job_queue_mutex);
-	      printf("All jobs have been moved back to Submission Queue. Add new jobs if needed, then type 'submit' to choose a scheduling policy.\n");
-
-	      // Re display main menu
+	      // Submit New Jobs
+	      initialize_job_submission();
+	      
+	      // Re-display main menu
 	      display_menu();
+	      continue;
 	    }
 	    else {
 	      // If user typed something else
 	      error_message("Please type 'yes' or 'no'.");
-	}
+	    }
 	}
 
 	//----------------
