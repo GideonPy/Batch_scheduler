@@ -121,18 +121,24 @@ int main() {
 	    for (int i = 0; choice[i]; i++) {
 	      choice[i] = (char)tolower((unsigned char)choice[i]);
 	    }
+	    // Handle yes 
 	    
 	    if (strcmp(choice, "yes") == 0) {
 	      // Ask for new sheduling policy
 	      printf("Choose a new scheduling policy (0 - FCFS, 1 - SJF, 2 - Priority)\n> ");
-	      int new_policy;
-	      if(scanf("%d", &new_policy) != 1) {
+	      char policy_input[10];
+	      
+	      if(!fgets(policy_input, sizeof(policy_input), stdin)) {
 		error_message("Invalid input.");
-		while(getchar() != '\n');
 		continue;
 	      }
-	      // Flush leftover input
-	      while (getchar() != '\n');
+	      
+	      // Convert input to integer
+	      int new_policy;
+	      if(sscanf(policy_input, "%d", &new_policy) != 1) {
+		error_message("Invalid input. Please enter a valid number (0, 1, or 2.");
+		continue;
+	      }
 
 	      apply_scheduling_policy(new_policy);
               printf("New scheduling policy applied. Type 'start' to execute jobs again.\n");
@@ -146,10 +152,7 @@ int main() {
 	      display_menu();
 	      continue;
 	    }
-	    else {
-	      // If user typed something else
-	      error_message("Please type 'yes' or 'no'.");
-	    }
+	    
 	}
 
 	//----------------

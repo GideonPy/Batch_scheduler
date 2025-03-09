@@ -7,7 +7,7 @@ void log_message(const char *message) {
 
 // Prints and error message
 void error_message(const char *message) {
-  fprintf(stderr, "[ERROR]: %s\n", message);
+  printf("[ERROR]: %s\n", message);
 }
 
 // Validates if a job exsist in the current directory before execution

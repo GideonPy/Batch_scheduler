@@ -114,5 +114,5 @@ void insert_sorted(job_t **queue, job_t *job, int policy) {
 int compare_jobs(job_t *a, job_t *b, int policy) {
   if (policy == 0) return a->arrival_time.tv_sec - b->arrival_time.tv_sec; // FCFS
   if (policy == 1) return a->execution_time - b->execution_time; // SJF
-  return b->priority - a->priority; // Priority
+  return a->priority - b->priority; // Priority
 }
