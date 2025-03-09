@@ -39,7 +39,7 @@ int main() {
 	//----------------
 	// JOB Command
 	//----------------
-	if (strcmp(command, "job") == 0) {
+	if (strcmp(command, "jobs") == 0) {
 	  
 	  initialize_job_submission();
 	  continue;
