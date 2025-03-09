@@ -89,7 +89,7 @@ while (queue) {
 void clear_job_queue() {
   pthread_mutex_lock(&job_queue_mutex);
 
-  // Clear Scheduled Queue() {
+  // Clear Scheduled Queue() 
   while (scheduled_queue_head) {
     job_t *temp = scheduled_queue_head;
     scheduled_queue_head = scheduled_queue_head->next;

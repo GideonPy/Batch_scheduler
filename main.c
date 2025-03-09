@@ -4,6 +4,7 @@
 void display_menu() {
     printf("\n===================== AUbatch Scheduler Menu =====================\n");
     printf("\nAvailable Commands:\n");
+    printf(" jobs - Enter jobs into program to be be evaluated.\n");
     printf(" submit - Submit jobs and choose scheduling policy before execution.\n");
     printf(" start - Begin job execution from Scheduled Queue.\n");
     printf(" list-submitted - List jobs in Submission Queue.\n");
@@ -20,9 +21,6 @@ int main() {
     // Initialize scheduler
     initialize_scheduler();
     
-    // Prompt user to submit jobs at startup
-    initialize_job_submission();
-    
     // Display the Main menu
     display_menu();
 
@@ -37,6 +35,15 @@ int main() {
 	}
 	// Remove trailing newline
         command[strcspn(command, "\n")] = 0;
+
+	//----------------
+	// JOB Command
+	//----------------
+	if (strcmp(command, "job") == 0) {
+	  
+	  initialize_job_submission();
+	  continue;
+	}
 
 	//-----------------
 	// SUBMIT Commmand
@@ -134,9 +141,6 @@ int main() {
 	      
 	      // Clear all jobs before returning to the menu
 	      clear_job_queue();
-
-	      // Submit New Jobs
-	      initialize_job_submission();
 	      
 	      // Re-display main menu
 	      display_menu();
